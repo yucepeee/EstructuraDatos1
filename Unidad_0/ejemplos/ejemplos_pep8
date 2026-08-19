@@ -1,0 +1,77 @@
+"""
+Aplicación de PEP 8
+---------------------------
+Ejemplos aplicando la guía de estilo oficial PEP 8 para código Python.
+
+Autor:     Gabriel Romulo Arnez Joven
+
+Registro: 220000417
+
+Materia:   Estructura de Datos 1
+
+Profesor:  Ing. Juan Carlos Peinado Pereira
+
+Fecha:     15/08/2026
+"""
+
+def calculate_area(base, height):
+    """Calcula el área de un rectángulo a partir de su base y altura.
+
+    Parameters:
+        base (int o float): Longitud de la base.
+        height (int o float): Longitud de la altura.
+
+    Returns:
+        float: Área total del rectángulo.
+    """
+    area = base * height
+    return area
+
+
+if __name__ == "__main__":
+  #Llamada al metodo calculate_area
+    rect_area = calculate_area(10, 5)
+    print(f"El área del rectángulo es: {rect_area}")
+
+# ===============================================================
+
+def is_even(numero):
+    """Determina si un número entero es par o impar.
+
+    Args:
+        numero (int): El número entero a evaluar.
+
+    Returns:
+        bool: True si el número es par, False si es impar.
+    """
+    return numero % 2 == 0
+
+
+if __name__ == "__main__":
+  #Llamada al metodo is_even
+    num = 8
+    if is_even(num):
+        print(f"El número {num} es par.")
+    else:
+        print(f"El número {num} es impar.")
+
+# ===============================================================
+
+def celsius_to_fahrenheit(celsius):
+    """Convierte una temperatura de grados Celsius a Fahrenheit.
+
+    Args:
+        celsius (int o float): Temperatura en grados Celsius.
+
+    Returns:
+        float: Temperatura equivalente en grados Fahrenheit.
+    """
+    fahrenheit = (celsius * 9 / 5) + 32
+    return fahrenheit
+
+
+if __name__ == "__main__":
+  #Llamada al metodo celsius_to_fahrenheit
+    temp_celsius = 25.0
+    temp_fahrenheit = celsius_to_fahrenheit(temp_celsius)
+    print(f"{temp_celsius}°C equivale a {temp_fahrenheit}°F")
