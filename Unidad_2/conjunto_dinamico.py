@@ -9,7 +9,7 @@ Materia: Estructura de Datos 1
 
 Profesor: Ing. Juan Carlos Peinado Pereira
 
-Fecha: 26/08/2026 """
+Fecha: 30/08/2026 """
 
 class Conjunto_Dinamico:
     """ADT conjunto respaldado por una lista dinámica."""
