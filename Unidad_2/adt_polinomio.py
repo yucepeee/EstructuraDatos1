@@ -47,23 +47,70 @@ class Polinomio:
         """Devuelve una representación en cadena del polinomio."""
         if self.cabeza is None:
             return "0"
-
+        actual = self.cabeza
         resultado = ""
+        while actual is not None:
+            if actual.coeficiente != 0:
+                if actual.coeficiente > 0 and resultado != "":
+                    resultado += " + "
+                elif actual.coeficiente < 0:
+                    resultado += " - "
+                resultado += f"{abs(actual.coeficiente)}x^{actual.exponente}"
+            actual = actual.siguiente
+        return resultado
+
+    # Conversor de expresiones a notación prefija y postfija
+
+    def prefija(self):
+        """Devuelve el polinomio usando notación prefija."""
+        if self.cabeza is None:
+            return "0"
+
+        terminos = []
         actual = self.cabeza
         while actual is not None:
-            if actual.coeficiente != 0: # Ignorar términos con coeficiente 0
-                resultado += "+"
-            if actual.coeficiente == -1 and actual.exponente != 0:
-                resultado += "-"
-            elif actual.coeficiente != 1 or actual.exponente == 0:
-                resultado += str(actual.coeficiente)
-            if actual.exponente > 0:
-                resultado += "x"
-                if actual.exponente > 1:
-                    resultado += "^" + str(actual.exponente)
+            if actual.coeficiente != 0:
+                if actual.exponente == 0:
+                    terminos.append(str(actual.coeficiente))
+                else:
+                    terminos.append(
+                        f"* {actual.coeficiente} x^{actual.exponente}"
+                    )
             actual = actual.siguiente
-        return resultado if resultado else "0"
-        
+
+        if not terminos:
+            return "0"
+
+        resultado = terminos[0]
+        for termino in terminos[1:]:
+            resultado = f"+ {resultado} {termino}"
+        return resultado
+
+    def postfija(self):
+        """Devuelve el polinomio usando notación postfija."""
+        if self.cabeza is None:
+            return "0"
+
+        terminos = []
+        actual = self.cabeza
+        while actual is not None:
+            if actual.coeficiente != 0:
+                if actual.exponente == 0:
+                    terminos.append(str(actual.coeficiente))
+                else:
+                    terminos.append(
+                        f"{actual.coeficiente} x^{actual.exponente} *"
+                    )
+            actual = actual.siguiente
+
+        if not terminos:
+            return "0"
+
+        resultado = terminos[0]
+        for termino in terminos[1:]:
+            resultado = f"{resultado} {termino} +"
+        return resultado
+
 # Ejemplo de uso
 
 if __name__ == "__main__":
@@ -72,5 +119,5 @@ if __name__ == "__main__":
     p.agregar_termino(-1, 2)
     p.agregar_termino(5, 0)
     print(p)
-
-    
+    print(p.prefija())
+    print(p.postfija())
