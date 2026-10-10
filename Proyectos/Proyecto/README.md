@@ -1,81 +1,129 @@
 # Simulador de logística y estructuras de datos
 
-Proyecto educativo de Estructuras de Datos 1 que busca evolucionar hacia un
-simulador de logística y despacho de recursos. Este README describe el estado
-del código disponible actualmente; la propuesta completa todavía no está
-implementada.
+Proyecto educativo desarrollado para aplicar estructuras de datos lineales en un
+simulador de centro logístico. La aplicación combina una interfaz gráfica con
+Flet y una implementación manual de varios tipos de estructuras enlazadas.
 
 ## Estado actual
 
-La interfaz existente es una ventana de escritorio hecha con **Tkinter**. Muestra
-una etiqueta y un botón que cambia el texto de la etiqueta. No es todavía una
-interfaz de simulación logística y el proyecto **no utiliza Flet**.
+La versión actual ya incluye una interfaz funcional de escritorio con **Flet**
+para simular operaciones de recepción, despacho, almacenamiento y carga de
+vehículos.
 
-En `src/models/structures.py` están implementadas manualmente con nodos:
+### Estructuras implementadas
 
-- Lista doblemente enlazada, con inserción al inicio y al final, búsqueda y
-  eliminación por valor.
-- Pila enlazada (`Stack`), con operaciones `push` y `pop`.
-- Gestor de deshacer y rehacer (`UndoRedoManager`), basado en dos pilas.
-- Cola circular enlazada, con operaciones `enqueue` y `dequeue`.
-- Cola de prioridad enlazada, que atiende primero el elemento con el número de
-  prioridad más alto.
+En `src/models/structures.py` se desarrollan manualmente con nodos:
 
-Estas estructuras todavía no están integradas en la interfaz. Tampoco se
-encuentran implementados el motor logístico, las rutas de despacho, las listas
-simplemente enlazadas ni una cola FIFO convencional.
+- Lista doblemente enlazada (`DoublyLinkedList`)
+- Pila enlazada (`Stack`)
+- Gestor de deshacer y rehacer (`UndoRedoManager`)
+- Cola circular (`CircularQueue`)
+- Cola de prioridad (`PriorityQueue`)
 
-## Estructura del proyecto
+Estas estructuras se usan en el motor del sistema para modelar:
+
+- Almacenes (lista doblemente enlazada)
+- Pedidos pendientes (cola de prioridad)
+- Flota de vehículos (cola circular)
+- Carga de cada vehículo (pila LIFO)
+- Historial de acciones (deshacer/rehacer)
+
+## Arquitectura del proyecto
 
 ```text
-src/
-├── main.py
-├── controllers/
-│   └── app_controller.py
-├── models/
-│   ├── logistic_engine.py
-│   └── structures.py
-├── views/
-│   ├── desktop_view.py
-│   └── responsive_components.py
-└── test_structures.py
-requirements.txt
+Proyecto/
+├── README.md
+├── requirements.txt
+├── src/
+│   ├── main.py
+│   ├── test_structures.py
+│   ├── controllers/
+│   │   └── app_controller.py
+│   ├── models/
+│   │   ├── logistic_engine.py
+│   │   └── structures.py
+│   └── views/
+│       ├── desktop_view.py
+│       └── responsive_components.py
+└── .venv/
 ```
 
-La organización separa archivos en modelos, vistas y controladores, pero el
-flujo MVC aún no está conectado funcionalmente. `logistic_engine.py` y
-`responsive_components.py` no contienen implementación actualmente.
+### Componentes principales
 
-## Requisitos y ejecución
+- `src/main.py`: punto de entrada de la aplicación
+- `src/models/logistic_engine.py`: motor lógico del simulador
+- `src/models/structures.py`: implementaciones de estructuras de datos
+- `src/controllers/app_controller.py`: coordinación entre la vista y el motor
+- `src/views/desktop_view.py`: interfaz principal con Flet
+- `src/views/responsive_components.py`: componentes visuales de cada estructura
 
-- Python 3.
-- Tkinter, incluido normalmente con las distribuciones de Python para
-  escritorio.
-- `requirements.txt` no declara dependencias externas.
+## Requisitos
 
-La aplicación aún no puede iniciarse correctamente tal como está: `main.py`
-importa `DataModel` desde `models.structures`, pero esa clase no existe. Además,
-la creación del controlador y las interfaces esperadas por `Controller` no
-coinciden con las definidas en la vista actual. Es necesario resolver esa
-integración antes de ejecutar `main.py`.
+- Python 3.10 o superior
+- Flet
+
+### Instalación
+
+Se recomienda usar un entorno virtual e instalar las dependencias necesarias:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install flet
+```
+
+## Ejecución
+
+Desde la raíz del proyecto:
+
+```bash
+python src/main.py
+```
+
+También es posible ejecutarlo con Flet directamente:
+
+```bash
+python -m flet run src/main.py
+```
 
 ## Pruebas
 
-Las pruebas existentes cubren la eliminación en la lista doblemente enlazada y
-el orden de atención de la cola de prioridad y la cola circular. Para ejecutarlas
-desde la carpeta `src`:
+Las pruebas actuales validan el comportamiento de las estructuras implementadas.
+Para ejecutarlas:
 
 ```bash
+cd src
 python -m unittest test_structures
 ```
 
-## Objetivo del proyecto
+Resultado esperado:
 
-La propuesta es desarrollar un simulador educativo de un centro logístico que
-permita aplicar estructuras de datos lineales implementadas desde cero,
-arquitectura MVC y operaciones de deshacer/rehacer. La meta planteada contempla
-una interfaz multiplataforma con Flet; su implementación, así como el análisis
-de complejidad de las operaciones, queda pendiente en el código actual.
+```text
+Ran 3 tests in 0.000s
+
+OK
+```
+
+## Funcionalidades del simulador
+
+- Agregar almacenes a la red logística
+- Registrar vehículos en la flota
+- Crear paquetes con prioridad
+- Encolar pedidos según nivel de prioridad
+- Despachar el siguiente pedido con atención por prioridad
+- Cargar paquetes en cada vehículo mediante una pila
+- Deshacer y rehacer operaciones de despacho
+
+## Objetivo pedagógico
+
+El proyecto tiene un enfoque académico y permite visualizar cómo se aplican:
+
+- listas enlazadas,
+- colas,
+- pilas,
+- prioridad,
+- deshacer/rehacer,
+- arquitectura MVC en una aplicación de escritorio.
 
 ## Autor
 

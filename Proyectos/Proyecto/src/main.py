@@ -1,20 +1,7 @@
-# filepath: /tkinter-mvc-app/tkinter-mvc-app/src/main.py
+# main.py
+import flet as ft
+from views.desktop_view import main_view
 
-import tkinter as tk
-from views.desktop_view import View
-from controllers.app_controller import Controller
-from models.structures import DataModel as Model
-
-def main():
-    root = tk.Tk()
-    root.title("Tkinter MVC App")
-    
-    model = Model()
-    model.add_data("Sample Data option 1")
-    view = View(root)
-    controller = Controller(view,model)
-    
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    # Arranca la aplicación de escritorio (Actualizado para Flet moderno)
+    ft.run(main_view)
