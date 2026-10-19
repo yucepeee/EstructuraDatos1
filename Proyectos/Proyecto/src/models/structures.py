@@ -180,3 +180,25 @@ class PriorityQueue:
         self.head = self.head.next
         self._size -= 1
         return value
+
+class CircularDoublyLinkedList:
+    """Clase para representar una lista doblemente enlazada circular."""
+    def __init__(self):
+        self.head = None
+        self.tail = None
+        self._size = 0
+
+    def append(self, data):
+        new_node = Node(data)
+        if not self.head:
+            self.head = new_node
+            self.tail = new_node
+            new_node.next = new_node
+            new_node.prev = new_node
+        else:
+            new_node.prev = self.tail
+            new_node.next = self.head
+            self.tail.next = new_node
+            self.head.prev = new_node
+            self.tail = new_node
+        self._size += 1

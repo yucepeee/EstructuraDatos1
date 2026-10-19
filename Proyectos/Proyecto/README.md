@@ -129,5 +129,5 @@ El proyecto tiene un enfoque académico y permite visualizar cómo se aplican:
 
 - **Nombre:** Gabriel Romulo Arnez Joven
 - **Registro:** 220000417
-- **Materia:** Estructura de Datos 2
+- **Materia:** Estructura de Datos 1
 - **Docente:** Ing. Juan Carlos Peinado Pereira
