@@ -120,32 +120,33 @@ class MetricsPanelView(ft.Column):
         super().__init__(spacing=10)
         self.controller = controller
         
+        import sys
+        from models.structures import Node
         self.base_node_memory = sys.getsizeof(Node(None))
         
-        self.op_count_text = ft.Text("Operaciones (Tiempo real): 0", weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_600)
+        self.op_count_text = ft.Text("Operaciones (Totales): 0", weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_600)
         self.memory_text = ft.Text("Memoria dinámica: 0 bytes", weight=ft.FontWeight.BOLD, color=ft.Colors.RED_500)
+        self.time_text = ft.Text("Tiempo última acción: 0.000 ms", weight=ft.FontWeight.BOLD, color=ft.Colors.PURPLE_600)
         
-        # Tabla de comparación con textos más cortos para evitar superposición
         self.complexity_table = ft.DataTable(
-            column_spacing=15, # Reduce el espacio vacío entre columnas
+            column_spacing=15,
             horizontal_margin=10,
             columns=[
                 ft.DataColumn(ft.Text("Acción", weight=ft.FontWeight.BOLD)),
                 ft.DataColumn(ft.Text("Tus Nodos", weight=ft.FontWeight.BOLD)),
-                ft.DataColumn(ft.Text("Python", weight=ft.FontWeight.BOLD)),
             ],
             rows=[
-                ft.DataRow(cells=[ft.DataCell(ft.Text("Insertar inicio")), ft.DataCell(ft.Text("O(1)", color=ft.Colors.GREEN)), ft.DataCell(ft.Text("O(n)", color=ft.Colors.RED))]),
-                ft.DataRow(cells=[ft.DataCell(ft.Text("Borrar intermedio")), ft.DataCell(ft.Text("O(1)*", color=ft.Colors.GREEN)), ft.DataCell(ft.Text("O(n)", color=ft.Colors.RED))]),
-                ft.DataRow(cells=[ft.DataCell(ft.Text("Push/Pop Pila")), ft.DataCell(ft.Text("O(1)", color=ft.Colors.GREEN)), ft.DataCell(ft.Text("O(1)", color=ft.Colors.ORANGE))]),
+                ft.DataRow(cells=[ft.DataCell(ft.Text("Insertar / Encolar")), ft.DataCell(ft.Text("O(1)", color=ft.Colors.GREEN))]),
+                ft.DataRow(cells=[ft.DataCell(ft.Text("Recorrer Nodos")), ft.DataCell(ft.Text("O(n)", color=ft.Colors.RED))]),
+                ft.DataRow(cells=[ft.DataCell(ft.Text("Push/Pop Pila")), ft.DataCell(ft.Text("O(1)", color=ft.Colors.GREEN))]),
             ]
         )
         
         self.controls = [
-            ft.Text("Análisis y Rendimiento", size=18, weight=ft.FontWeight.BOLD),
+            ft.Text("Análisis y Rendimiento En Vivo", size=18, weight=ft.FontWeight.BOLD),
             self.op_count_text,
             self.memory_text,
-            # Envolver la tabla en un Row con scroll evita que se aplaste si la ventana es pequeña
+            self.time_text,
             ft.Row([self.complexity_table], scroll=ft.ScrollMode.AUTO)
         ]
 
@@ -156,8 +157,7 @@ class MetricsPanelView(ft.Column):
             while True:
                 count += 1
                 curr = curr.next
-                if curr == self.controller.engine.warehouses.head:
-                    break
+                if curr == self.controller.engine.warehouses.head: break
                     
         curr = self.controller.engine.pending_orders.head
         while curr:
@@ -173,14 +173,50 @@ class MetricsPanelView(ft.Column):
                 while cargo_curr:
                     count += 1
                     cargo_curr = cargo_curr.next
-                if curr == self.controller.engine.vehicle_fleet.tail:
-                    break
+                if curr == self.controller.engine.vehicle_fleet.tail: break
                 curr = curr.next
                 
         return count
 
     def update_view(self):
-        self.op_count_text.value = f"Operaciones (Tiempo real): {self.controller.operation_count}"
+        # Actualizar textos
+        self.op_count_text.value = f"Operaciones (Totales): {self.controller.operation_count}"
+        self.time_text.value = f"Tiempo de ejecución CPU: {self.controller.last_exec_time:.4f} ms"
+        
         total_nodes = self.count_total_nodes()
-        total_memory = total_nodes * self.base_node_memory
-        self.memory_text.value = f"Memoria: ~{total_memory} bytes ({total_nodes} Nodos)"
+        self.memory_text.value = f"Memoria RAM: ~{total_nodes * self.base_node_memory} bytes ({total_nodes} Nodos)"
+        
+        # Dinamismo visual en la tabla (Ejecuciones Algorítmicas Reales)
+        last_action = getattr(self.controller, 'last_action_type', None)
+        pasos_reales = getattr(self.controller, 'last_steps', 0)
+        
+        labels = ["Insertar / Encolar", "Recorrer Nodos", "Push/Pop Pila"]
+        
+        # Restaurar la tabla a su estado base
+        for i in range(3):
+            self.complexity_table.rows[i].cells[0].content.value = labels[i]
+            self.complexity_table.rows[i].cells[0].content.color = ft.Colors.BLACK
+            
+            # Restaurar la columna 1 (Tus Nodos) a la teoría original
+            textos_teoricos = ["O(1) o O(n)", "O(n)", "O(1)"]
+            self.complexity_table.rows[i].cells[1].content.value = textos_teoricos[i]
+            self.complexity_table.rows[i].cells[1].content.color = ft.Colors.GREY_700
+            
+        # Resaltar la fila correspondiente y mostrar LOS PASOS EXACTOS
+        if last_action == "insert":
+            self.complexity_table.rows[0].cells[0].content.value = f"👉 {labels[0]}"
+            self.complexity_table.rows[0].cells[0].content.color = ft.Colors.BLUE_700
+            self.complexity_table.rows[0].cells[1].content.value = f"{pasos_reales} Ejecuciones"
+            self.complexity_table.rows[0].cells[1].content.color = ft.Colors.GREEN_600 if pasos_reales == 1 else ft.Colors.RED_600
+            
+        elif last_action == "traverse":
+            self.complexity_table.rows[1].cells[0].content.value = f"👉 {labels[1]}"
+            self.complexity_table.rows[1].cells[0].content.color = ft.Colors.BLUE_700
+            self.complexity_table.rows[1].cells[1].content.value = f"{pasos_reales} Ejecuciones"
+            self.complexity_table.rows[1].cells[1].content.color = ft.Colors.GREEN_600 if pasos_reales == 1 else ft.Colors.RED_600
+            
+        elif last_action == "stack":
+            self.complexity_table.rows[2].cells[0].content.value = f"👉 {labels[2]}"
+            self.complexity_table.rows[2].cells[0].content.color = ft.Colors.BLUE_700
+            self.complexity_table.rows[2].cells[1].content.value = f"{pasos_reales} Ejecuciones"
+            self.complexity_table.rows[2].cells[1].content.color = ft.Colors.GREEN_600 if pasos_reales <= 2 else ft.Colors.RED_600
