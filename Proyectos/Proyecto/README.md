@@ -1,75 +1,111 @@
-# Simulador de logística y estructuras de datos
+# Simulador de centro logístico
 
-Proyecto educativo desarrollado para aplicar estructuras de datos lineales en un
-simulador de centro logístico. La aplicación combina una interfaz gráfica con
-Flet y una implementación manual de varios tipos de estructuras enlazadas.
+Aplicación de escritorio educativa para visualizar operaciones de un centro
+logístico y el uso de estructuras de datos enlazadas. Está desarrollada en
+Python con Flet.
 
-## Estado actual
+## Funcionalidades
 
-La versión actual ya incluye una interfaz funcional de escritorio con **Flet**
-para simular operaciones de recepción, despacho, almacenamiento y carga de
-vehículos.
+- Registrar almacenes y visualizarlos como una ruta circular.
+- Registrar vehículos en una flota circular.
+- Recibir pedidos y ordenarlos por prioridad numérica, de mayor a menor. Los
+  pedidos con la misma prioridad conservan el orden de llegada.
+- Despachar el pedido más urgente al primer vehículo disponible que tenga
+  capacidad suficiente.
+- Ver los pedidos pendientes y la carga de cada vehículo.
+- Deshacer y rehacer operaciones de despacho.
+- Avanzar el vehículo por la ruta. Cuando completa una vuelta, los vehículos
+  que estén llenos descargan sus paquetes.
+- Ejecutar una demostración guiada y consultar métricas aproximadas de
+  operaciones, nodos y tiempo de ejecución.
 
-### Estructuras implementadas
+### Capacidad de los vehículos
 
-En `src/models/structures.py` se desarrollan manualmente con nodos:
+Cada vehículo tiene una capacidad máxima de 10 unidades. El peso asignado a
+cada paquete depende de su prioridad:
 
-- Lista doblemente enlazada (`DoublyLinkedList`)
-- Pila enlazada (`Stack`)
-- Gestor de deshacer y rehacer (`UndoRedoManager`)
-- Cola circular (`CircularQueue`)
-- Cola de prioridad (`PriorityQueue`)
+| Prioridad | Espacio ocupado |
+| --- | ---: |
+| Menor que 5 | 1 unidad |
+| De 5 a 9 | 2 unidades |
+| 10 o más | 10 unidades |
 
-Estas estructuras se usan en el motor del sistema para modelar:
+La interfaz muestra de 1 a 10 como rango de referencia y admite prioridades
+enteras positivas. Los pedidos de mayor prioridad se procesan primero; los de
+prioridad 10 o superior ocupan toda la capacidad del vehículo.
 
-- Almacenes (lista doblemente enlazada)
-- Pedidos pendientes (cola de prioridad)
-- Flota de vehículos (cola circular)
-- Carga de cada vehículo (pila LIFO)
-- Historial de acciones (deshacer/rehacer)
+## Estructuras de datos
 
-## Arquitectura del proyecto
+Las implementaciones manuales se encuentran en `src/models/structures.py`:
+
+- `DoublyLinkedList`: almacenes en el modelo del motor.
+- `CircularDoublyLinkedList`: ruta de almacenes que muestra la interfaz.
+- `PriorityQueue`: pedidos pendientes, ordenados por prioridad.
+- `CircularQueue`: flota de vehículos.
+- `Stack`: carga LIFO de cada vehículo y pilas internas del historial.
+- `UndoRedoManager`: almacenamiento de acciones para deshacer y rehacer.
+
+El deshacer y rehacer disponible en la interfaz está implementado para los
+despachos. La aplicación presenta las estructuras y sus operaciones; no incluye
+persistencia de datos, por lo que los datos se reinician al cerrar el programa.
+
+## Estructura del proyecto
 
 ```text
 Proyecto/
 ├── README.md
 ├── requirements.txt
-├── src/
-│   ├── main.py
-│   ├── test_structures.py
-│   ├── controllers/
-│   │   └── app_controller.py
-│   ├── models/
-│   │   ├── logistic_engine.py
-│   │   └── structures.py
-│   └── views/
-│       ├── desktop_view.py
-│       └── responsive_components.py
-└── .venv/
+└── src/
+    ├── main.py
+    ├── test_engine.py
+    ├── test_structures.py
+    ├── controllers/
+    │   └── app_controller.py
+    ├── models/
+    │   ├── logistic_engine.py
+    │   └── structures.py
+    └── views/
+        ├── desktop_view.py
+        └── responsive_components.py
 ```
 
 ### Componentes principales
 
-- `src/main.py`: punto de entrada de la aplicación
-- `src/models/logistic_engine.py`: motor lógico del simulador
-- `src/models/structures.py`: implementaciones de estructuras de datos
-- `src/controllers/app_controller.py`: coordinación entre la vista y el motor
-- `src/views/desktop_view.py`: interfaz principal con Flet
-- `src/views/responsive_components.py`: componentes visuales de cada estructura
+- `src/main.py`: inicia la aplicación Flet.
+- `src/models/logistic_engine.py`: define paquetes, vehículos, almacenes y
+  lógica de recepción y despacho.
+- `src/models/structures.py`: implementa las estructuras de datos enlazadas.
+- `src/controllers/app_controller.py`: coordina la interfaz, el motor, la ruta
+  y las acciones de deshacer/rehacer.
+- `src/views/desktop_view.py`: construye la interfaz y los controles.
+- `src/views/responsive_components.py`: dibuja las estructuras y el panel de
+  métricas.
+- `src/test_engine.py` y `src/test_structures.py`: pruebas del motor y las
+  estructuras.
 
-## Requisitos
+## Requisitos e instalación
 
-- Python 3.10 o superior
-- Flet
+- Python 3.10 o superior.
+- Flet.
 
-### Instalación
-
-Se recomienda usar un entorno virtual e instalar las dependencias necesarias:
+El archivo `requirements.txt` está vacío actualmente; instala Flet directamente:
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
-pip install flet
+```
+
+En Windows:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m pip install flet
+```
+
+En macOS o Linux:
+
+```bash
+source .venv/bin/activate
+python -m pip install flet
 ```
 
 ## Ejecución
@@ -80,52 +116,26 @@ Desde la raíz del proyecto:
 python src/main.py
 ```
 
-También es posible ejecutarlo con Flet directamente:
-
-```bash
-python -m flet run src/main.py
-```
+La interfaz incluye el botón **Ejecutar Demo**, que carga datos de ejemplo y
+recorre las operaciones de la simulación.
 
 ## Pruebas
 
-Las pruebas actuales validan el comportamiento de las estructuras implementadas.
-Para ejecutarlas:
+Los módulos de prueba importan los paquetes desde `src`, por lo que se ejecutan
+desde ese directorio:
 
 ```bash
 cd src
-python -m unittest test_structures
+python -m unittest test_structures test_engine
 ```
-
-Resultado esperado:
-
-```text
-Ran 3 tests in 0.000s
-
-OK
-```
-
-## Funcionalidades del simulador
-
-- Agregar almacenes a la red logística
-- Registrar vehículos en la flota
-- Crear paquetes con prioridad
-- Encolar pedidos según nivel de prioridad
-- Despachar el siguiente pedido con atención por prioridad
-- Cargar paquetes en cada vehículo mediante una pila
-- Deshacer y rehacer operaciones de despacho
 
 ## Objetivo pedagógico
 
-El proyecto tiene un enfoque académico y permite visualizar cómo se aplican:
+El proyecto permite observar la inserción y recorrido de nodos, la atención por
+prioridad, el comportamiento LIFO de una pila, la asignación circular de
+vehículos y el costo aproximado de algunas operaciones.
 
-- listas enlazadas,
-- colas,
-- pilas,
-- prioridad,
-- deshacer/rehacer,
-- arquitectura MVC en una aplicación de escritorio.
-
-## Autor
+## Autoría
 
 - **Nombre:** Gabriel Romulo Arnez Joven
 - **Registro:** 220000417

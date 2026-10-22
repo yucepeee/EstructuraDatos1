@@ -102,6 +102,7 @@ def main_view(page: ft.Page):
         refresh_views()
 
     async def on_run_demo(e):
+        """Ejecuta una demostración automática de la aplicación, mostrando la funcionalidad paso a paso."""
         # 1. Añadir 5 almacenes uno por uno (más pausado)
         for i in range(1, 6):
             controller.add_warehouse(f"Almacén {i}")
